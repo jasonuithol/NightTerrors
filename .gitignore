@@ -1,5 +1,6 @@
 bin/
 obj/
+staging/
 release/
 *.user
 .vs/
