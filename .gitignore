@@ -4,3 +4,4 @@ staging/
 release/
 *.user
 .vs/
+resume-claude.sh
