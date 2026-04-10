@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#1a0a2e"/>
+      <stop offset="100%" stop-color="#000008"/>
+    </radialGradient>
+    <radialGradient id="glow" cx="50%" cy="40%" r="40%">
+      <stop offset="0%" stop-color="#4a1a6a" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#000008" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="ghostBlur">
+      <feGaussianBlur stdDeviation="2.5"/>
+    </filter>
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="256" height="256" fill="url(#bg)" rx="18"/>
+  <rect width="256" height="256" fill="url(#glow)" rx="18"/>
+
+  <!-- Moon -->
+  <circle cx="128" cy="54" r="28" fill="#c8b0e8" opacity="0.18"/>
+  <circle cx="138" cy="48" r="24" fill="#000010" opacity="0.85"/>
+  <circle cx="128" cy="54" r="28" fill="none" stroke="#a080c0" stroke-width="1" opacity="0.4"/>
+
+  <!-- Mara figure — ghostly shroud body -->
+  <ellipse cx="128" cy="148" rx="38" ry="62" fill="#1e0835" opacity="0.9"/>
+
+  <!-- Shroud shreds / wisps at bottom -->
+  <path d="M 98 195 Q 88 220 82 240" stroke="#5a2090" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.7" filter="url(#ghostBlur)"/>
+  <path d="M 108 200 Q 102 228 100 250" stroke="#5a2090" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.6" filter="url(#ghostBlur)"/>
+  <path d="M 120 205 Q 118 232 116 256" stroke="#6a30a0" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.5" filter="url(#ghostBlur)"/>
+  <path d="M 132 205 Q 134 232 136 256" stroke="#5a2090" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.5" filter="url(#ghostBlur)"/>
+  <path d="M 144 202 Q 150 228 152 250" stroke="#5a2090" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.6" filter="url(#ghostBlur)"/>
+  <path d="M 155 196 Q 166 220 172 240" stroke="#5a2090" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.7" filter="url(#ghostBlur)"/>
+
+  <!-- Arms — outstretched and wispy -->
+  <path d="M 94 140 Q 60 128 38 118" stroke="#5a2090" stroke-width="7" fill="none" stroke-linecap="round" opacity="0.7" filter="url(#ghostBlur)"/>
+  <path d="M 94 140 Q 60 128 38 118" stroke="#8040c0" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.5"/>
+  <path d="M 162 140 Q 196 128 218 118" stroke="#5a2090" stroke-width="7" fill="none" stroke-linecap="round" opacity="0.7" filter="url(#ghostBlur)"/>
+  <path d="M 162 140 Q 196 128 218 118" stroke="#8040c0" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.5"/>
+
+  <!-- Head / cowl -->
+  <ellipse cx="128" cy="102" rx="30" ry="34" fill="#160525"/>
+  <ellipse cx="128" cy="98" rx="26" ry="28" fill="#0e0320"/>
+
+  <!-- Viking horned helm suggestion — subtle -->
+  <path d="M 100 88 Q 88 68 84 52" stroke="#3a1060" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.8"/>
+  <circle cx="83" cy="50" r="5" fill="#3a1060" opacity="0.7"/>
+  <path d="M 156 88 Q 168 68 172 52" stroke="#3a1060" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.8"/>
+  <circle cx="173" cy="50" r="5" fill="#3a1060" opacity="0.7"/>
+
+  <!-- Eyes — glowing violet -->
+  <ellipse cx="118" cy="100" rx="6" ry="7" fill="#7020c0" filter="url(#softGlow)" opacity="0.9"/>
+  <ellipse cx="138" cy="100" rx="6" ry="7" fill="#7020c0" filter="url(#softGlow)" opacity="0.9"/>
+  <ellipse cx="118" cy="100" rx="3" ry="3.5" fill="#e0b0ff"/>
+  <ellipse cx="138" cy="100" rx="3" ry="3.5" fill="#e0b0ff"/>
+
+  <!-- Mouth — thin, cruel -->
+  <path d="M 120 114 Q 128 119 136 114" stroke="#5a10a0" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.7"/>
+
+  <!-- Floating rune particles -->
+  <text x="52" y="80" font-family="serif" font-size="11" fill="#6030a0" opacity="0.5" transform="rotate(-15,52,80)">ᚷ</text>
+  <text x="188" y="72" font-family="serif" font-size="10" fill="#6030a0" opacity="0.4" transform="rotate(12,188,72)">ᚾ</text>
+  <text x="44" y="170" font-family="serif" font-size="9" fill="#5020a0" opacity="0.35" transform="rotate(-8,44,170)">ᛗ</text>
+  <text x="196" y="165" font-family="serif" font-size="10" fill="#5020a0" opacity="0.35" transform="rotate(10,196,165)">ᚦ</text>
+
+  <!-- Title -->
+  <text x="128" y="234" font-family="Georgia, serif" font-size="15" font-weight="bold"
+        fill="#c090f0" text-anchor="middle" letter-spacing="3" opacity="0.9">NIGHT TERRORS</text>
+</svg>
