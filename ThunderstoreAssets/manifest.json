@@ -1,6 +1,6 @@
 {
   "name": "NightTerrors",
-  "version_number": "1.0.0",
+  "version_number": "1.0.1",
   "website_url": "https://github.com/jasonuithol/NightTerrors",
   "description": "When all players sleep, Mara may take them. They awaken in darkness — stripped, swapped, or given strange tools — and must survive until dawn.",
   "dependencies": [

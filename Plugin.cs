@@ -10,7 +10,7 @@ namespace NightTerrors
     {
         public const string PluginGUID    = "nightterrors";
         public const string PluginName    = "NightTerrors";
-        public const string PluginVersion = "1.0.0";
+        public const string PluginVersion = "1.0.1";
 
         internal static ManualLogSource Log;
         internal static NightTerrorsPlugin Instance;
@@ -39,7 +39,7 @@ namespace NightTerrors
                 "Number of monsters to spawn.");
             CfgScenarioWeights = Config.Bind("General", "ScenarioWeights", "1,1,1,1",
                 "Comma-separated weights for: KeepGear, GoNaked, DifferentEquipment, SwapEquipment.");
-            CfgEventDuration = Config.Bind("General", "EventDuration", 30,
+            CfgEventDuration = Config.Bind("General", "EventDuration", 120,
                 "Maximum event duration in seconds. Survivors have their inventory restored and the event ends.");
             CfgWeatherPool = Config.Bind("Weather", "WeatherPool",
                 "ThunderStorm,Ashrain,Snow,Twilight_Snow,DeepForest_Mist,SwampRain,Mistlands_darkening",
