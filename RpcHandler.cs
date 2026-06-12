@@ -12,7 +12,21 @@ namespace NightTerrors
         public static bool     IsEventStarting;  // set as soon as SaveInventory arrives, before EventStart
         public static bool     SuppressMorning;  // stays true until player respawns after the event
         public static byte[]   SavedInventory;   // original inventory bytes
+        public static bool     PendingRestore;   // RestoreInventory arrived while player was dead
         public static Scenario CurrentScenario;
+
+        // Shared restore logic — called from the RPC handler and from OnSpawned.
+        public static void ApplyRestore()
+        {
+            var player = Player.m_localPlayer;
+            if (player == null || SavedInventory == null) return;
+
+            player.UnequipAllItems();
+            player.GetInventory().Load(new ZPackage(SavedInventory));
+            SavedInventory   = null;
+            PendingRestore   = false;
+            NightTerrorsPlugin.Log.LogInfo("NightTerrors: inventory restored.");
+        }
     }
 
     // ── RPC registration + handlers ─────────────────────────────────────────
@@ -29,11 +43,7 @@ namespace NightTerrors
                 ZRoutedRpc.instance.Register(
                     "NightTerrors_SaveInventory", new Action<long>(SaveInventory));
                 ZRoutedRpc.instance.Register<ZPackage>(
-                    "NightTerrors_UploadInventory", UploadInventory);
-                ZRoutedRpc.instance.Register<ZPackage>(
                     "NightTerrors_EventStart", EventStart);
-                ZRoutedRpc.instance.Register<ZPackage>(
-                    "NightTerrors_ReceiveInventory", ReceiveInventory);
                 ZRoutedRpc.instance.Register(
                     "NightTerrors_RestoreInventory", new Action<long>(RestoreInventory));
                 ZRoutedRpc.instance.Register(
@@ -62,11 +72,6 @@ namespace NightTerrors
             player.GetInventory().Save(pkg);
             NightTerrorsClient.SavedInventory = pkg.GetArray();
             NightTerrorsPlugin.Log.LogInfo("NightTerrors: inventory saved.");
-
-            // Upload to server for potential swap redistribution.
-            var upload = new ZPackage();
-            upload.Write(NightTerrorsClient.SavedInventory);
-            ZRoutedRpc.instance.InvokeRoutedRPC("NightTerrors_UploadInventory", upload);
         }
 
         // Server → All: begin event, apply scenario effects locally.
@@ -106,33 +111,22 @@ namespace NightTerrors
                     }
                     NightTerrorsPlugin.Log.LogInfo($"NightTerrors: equipped kit [{string.Join(", ", kit)}].");
                     break;
-                // KeepGear, SwapEquipment: inventory was already set before this RPC.
+                // KeepGear: inventory is unchanged.
             }
-        }
-
-        // Server → specific client: you got someone else's inventory (swap scenario).
-        static void ReceiveInventory(long sender, ZPackage pkg)
-        {
-            var player = Player.m_localPlayer;
-            if (player == null) return;
-
-            byte[] bytes = pkg.ReadByteArray();
-            player.UnequipAllItems();
-            player.GetInventory().Load(new ZPackage(bytes));
-            NightTerrorsPlugin.Log.LogInfo("NightTerrors: swapped inventory applied.");
         }
 
         // Server → All: restore your original inventory.
         static void RestoreInventory(long sender)
         {
             var player = Player.m_localPlayer;
-            if (player == null) return;
-            if (NightTerrorsClient.SavedInventory == null) return;
-
-            player.UnequipAllItems();
-            player.GetInventory().Load(new ZPackage(NightTerrorsClient.SavedInventory));
-            NightTerrorsClient.SavedInventory = null;
-            NightTerrorsPlugin.Log.LogInfo("NightTerrors: inventory restored.");
+            if (player == null || player.IsDead())
+            {
+                // Player is dead or not yet spawned — defer until OnSpawned fires.
+                NightTerrorsClient.PendingRestore = true;
+                NightTerrorsPlugin.Log.LogInfo("NightTerrors: restore deferred (player dead/null).");
+                return;
+            }
+            NightTerrorsClient.ApplyRestore();
         }
 
         // Server → All: event is over.
@@ -152,15 +146,6 @@ namespace NightTerrors
         }
 
         // ── Client → Server ─────────────────────────────────────────────────
-
-        // Client sends inventory bytes up to the server (for swap scenario).
-        static void UploadInventory(long sender, ZPackage pkg)
-        {
-            if (ZNet.instance == null || !ZNet.instance.IsServer()) return;
-            byte[] bytes = pkg.ReadByteArray();
-            NightTerrorsEvent.CollectedInventories[sender] = bytes;
-            NightTerrorsPlugin.Log.LogInfo($"NightTerrors: received inventory from peer {sender}.");
-        }
 
         // Client reports its death to the server.
         static void PlayerDied(long sender)

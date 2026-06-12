@@ -8,7 +8,6 @@ namespace NightTerrors
         KeepGear           = 0,
         GoNaked            = 1,
         DifferentEquipment = 2,
-        SwapEquipment      = 3,
     }
 
     public static class ScenarioSelector

@@ -11,8 +11,7 @@ namespace NightTerrors
         public static Scenario CurrentScenario;
         public static Vector3  ChosenDestination;
 
-        public static HashSet<long>          AlivePeers           = new HashSet<long>();
-        public static Dictionary<long, byte[]> CollectedInventories = new Dictionary<long, byte[]>();
+        public static HashSet<long> AlivePeers = new HashSet<long>();
 
         // ── Entry point ─────────────────────────────────────────────────────
 
@@ -31,7 +30,6 @@ namespace NightTerrors
 
             // Populate alive peers (connected, non-ghost peers only).
             AlivePeers.Clear();
-            CollectedInventories.Clear();
             var peers = ZNet.instance.GetPeers();
             foreach (var peer in peers)
             {
@@ -44,10 +42,6 @@ namespace NightTerrors
                 NightTerrorsPlugin.Log.LogWarning("NightTerrors: no valid peers — aborting.");
                 return;
             }
-
-            // Fall back to GoNaked if only one player and SwapEquipment was chosen.
-            if (CurrentScenario == Scenario.SwapEquipment && AlivePeers.Count == 1)
-                CurrentScenario = Scenario.GoNaked;
 
             IsActive = true;
             NightTerrorsPlugin.Log.LogInfo(
@@ -63,12 +57,9 @@ namespace NightTerrors
 
         static IEnumerator EventSequence()
         {
-            // Wait for SaveInventory RPCs to arrive and clients to upload.
-            yield return new WaitForSeconds(2.2f);
-
-            // === Phase 1: Swap inventories if needed ===
-            if (CurrentScenario == Scenario.SwapEquipment)
-                ExecuteSwap();
+            // Short wait for SaveInventory to be processed on clients before
+            // EventStart arrives and strips/replaces their inventory.
+            yield return new WaitForSeconds(1.5f);
 
             // === Phase 2: Build EventStart payload ===
             string[] kit = (CurrentScenario == Scenario.DifferentEquipment)
@@ -104,39 +95,6 @@ namespace NightTerrors
             {
                 NightTerrorsPlugin.Log.LogInfo("NightTerrors: time limit reached — ending event.");
                 End();
-            }
-        }
-
-        // ── Swap inventory redistribution ───────────────────────────────────
-
-        static void ExecuteSwap()
-        {
-            var peerList = AlivePeers.ToList();
-            // Simple shuffle.
-            for (int i = peerList.Count - 1; i > 0; i--)
-            {
-                int j = UnityEngine.Random.Range(0, i + 1);
-                long tmp = peerList[i]; peerList[i] = peerList[j]; peerList[j] = tmp;
-            }
-
-            // Rotate: peer[i] gets peer[(i+1) % n]'s inventory.
-            int n = peerList.Count;
-            for (int i = 0; i < n; i++)
-            {
-                long recipient = peerList[i];
-                long donor     = peerList[(i + 1) % n];
-
-                if (!CollectedInventories.TryGetValue(donor, out byte[] bytes))
-                {
-                    NightTerrorsPlugin.Log.LogWarning(
-                        $"NightTerrors: no upload from peer {donor} — skipping swap for peer {recipient}.");
-                    continue;
-                }
-
-                var pkg = new ZPackage();
-                pkg.Write(bytes);
-                ZRoutedRpc.instance.InvokeRoutedRPC(
-                    recipient, "NightTerrors_ReceiveInventory", pkg);
             }
         }
 
@@ -188,7 +146,6 @@ namespace NightTerrors
                 ZRoutedRpc.Everybody, "NightTerrors_EventEnd");
 
             AlivePeers.Clear();
-            CollectedInventories.Clear();
         }
 
         // ── Teleportation ───────────────────────────────────────────────────

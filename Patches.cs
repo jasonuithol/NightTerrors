@@ -90,13 +90,21 @@ namespace NightTerrors
         static bool Prefix() => !NightTerrorsClient.SuppressMorning;
     }
 
-    // When the player respawns after the event, deliver the suppressed "Day X" message.
+    // When the player respawns after the event, apply any deferred inventory restore
+    // and deliver the suppressed "Day X" message.
     [HarmonyPatch(typeof(Player), nameof(Player.OnSpawned))]
     static class Patch_Player_OnSpawned
     {
         static void Postfix(Player __instance)
         {
             if (__instance != Player.m_localPlayer) return;
+
+            if (NightTerrorsClient.PendingRestore)
+            {
+                NightTerrorsPlugin.Log.LogInfo("NightTerrors: applying deferred inventory restore on spawn.");
+                NightTerrorsClient.ApplyRestore();
+            }
+
             if (!NightTerrorsClient.SuppressMorning) return;
 
             NightTerrorsClient.SuppressMorning = false;

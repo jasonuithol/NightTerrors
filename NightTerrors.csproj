@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <ValheimDir>$(HOME)/.steam/steam/steamapps/common/Valheim dedicated server</ValheimDir>
+    <ValheimDir>/opt/valheim-server</ValheimDir>
     <BepInExDir>$(ValheimDir)/BepInEx</BepInExDir>
   </PropertyGroup>
 
